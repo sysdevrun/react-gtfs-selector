@@ -2,6 +2,12 @@
 
 A React component that lets users select a GTFS data source, either by dragging and dropping a local `.zip` file or by searching online GTFS feeds.
 
+**[Live demo](https://sysdevrun.github.io/react-gtfs-selector/)**
+
+| Import file | Online search |
+|:-----------:|:-------------:|
+| ![Import file tab](docs/images/import-file-tab.png) | ![Search tab](docs/images/search-tab.png) |
+
 ## Install
 
 ```bash
