@@ -50,11 +50,11 @@ describe('SourceSearch', () => {
     });
   });
 
-  it('shows "Coming soon" for unavailable sources', () => {
+  it('shows "Unavailable" for unavailable sources', () => {
     const source = createMockSource({ available: false });
     render(<SourceSearch source={source} onSelect={vi.fn()} />);
 
-    expect(screen.getByText(/Coming soon/)).toBeInTheDocument();
+    expect(screen.getByText(/Unavailable/)).toBeInTheDocument();
   });
 
   it('searches and displays results', async () => {

@@ -142,7 +142,7 @@ export function SourceSearch({ source, onSelect }: SourceSearchProps) {
     return (
       <div className="rgs-source-search rgs-source-search--unavailable">
         <p className="rgs-source-search__placeholder">
-          {source.label} — Coming soon
+          {source.label} — {source.unavailableMessage ?? 'Unavailable'}
         </p>
       </div>
     );
