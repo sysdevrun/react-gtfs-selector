@@ -1,0 +1,169 @@
+/* react-gtfs-selector default styles — import "react-gtfs-selector/style.css" to use */
+
+.rgs-selector {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  max-width: 600px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  color: #333;
+}
+
+/* Tabs */
+.rgs-selector__tabs {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  background: #f7f7f7;
+}
+
+.rgs-selector__tab {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.rgs-selector__tab:hover {
+  color: #333;
+}
+
+.rgs-selector__tab--active {
+  color: #0066cc;
+  border-bottom-color: #0066cc;
+  font-weight: 500;
+}
+
+.rgs-selector__panel {
+  padding: 16px;
+}
+
+/* Drop zone */
+.rgs-dropzone {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+
+.rgs-dropzone:hover {
+  border-color: #999;
+  background: #fafafa;
+}
+
+.rgs-dropzone--active {
+  border-color: #0066cc;
+  background: #e8f0fe;
+}
+
+.rgs-dropzone__icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.rgs-dropzone__text {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.rgs-dropzone__error {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: #d32f2f;
+}
+
+/* Source search */
+.rgs-source-search {
+  position: relative;
+}
+
+.rgs-source-search__input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.rgs-source-search__input:focus {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.15);
+}
+
+.rgs-source-search__results {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.rgs-source-search__item {
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.rgs-source-search__item:hover,
+.rgs-source-search__item--active {
+  background: #f0f4ff;
+}
+
+.rgs-source-search__item-title {
+  font-size: 14px;
+  flex: 1;
+}
+
+.rgs-source-search__item-area {
+  font-size: 12px;
+  color: #888;
+  white-space: nowrap;
+}
+
+.rgs-source-search__empty {
+  padding: 12px;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+}
+
+.rgs-source-search__loading,
+.rgs-source-search__error,
+.rgs-source-search__placeholder {
+  padding: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.rgs-source-search__error {
+  color: #d32f2f;
+}
+
+.rgs-source-search--unavailable {
+  opacity: 0.6;
+}
