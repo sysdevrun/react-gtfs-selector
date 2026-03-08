@@ -1,5 +1,7 @@
 # react-gtfs-selector
 
+[![npm](https://img.shields.io/npm/v/react-gtfs-selector)](https://www.npmjs.com/package/react-gtfs-selector)
+
 A React component that lets users select a GTFS data source, either by dragging and dropping a local `.zip` file or by searching online GTFS feeds.
 
 **[Live demo](https://sysdevrun.github.io/react-gtfs-selector/)**
