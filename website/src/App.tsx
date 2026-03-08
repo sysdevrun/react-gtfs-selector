@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { GtfsSelector, transportDataGouvFr, createMobilityDataSource } from 'react-gtfs-selector';
 import 'react-gtfs-selector/style.css';
 import type { GtfsSelectionResult } from 'react-gtfs-selector';
@@ -8,6 +8,8 @@ import type { GtfsWorkerApi } from './gtfs.worker';
 import { getProxyUrl } from './proxy';
 import { RouteList } from './RouteList';
 import './App.css';
+
+const TOKEN_STORAGE_KEY = 'rgs-mobility-api-token';
 
 function createWorker() {
   const raw = new Worker(new URL('./gtfs.worker.ts', import.meta.url), {
@@ -23,8 +25,19 @@ export function App() {
   const [phase, setPhase] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState<string | null>(null);
-  const [apiToken, setApiToken] = useState('');
+  const [apiToken, setApiToken] = useState(
+    () => localStorage.getItem(TOKEN_STORAGE_KEY) ?? '',
+  );
   const workerRef = useRef<Comlink.Remote<GtfsWorkerApi> | null>(null);
+
+  useEffect(() => {
+    const trimmed = apiToken.trim();
+    if (trimmed) {
+      localStorage.setItem(TOKEN_STORAGE_KEY, trimmed);
+    } else {
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
+    }
+  }, [apiToken]);
 
   const sources = useMemo(
     () =>
