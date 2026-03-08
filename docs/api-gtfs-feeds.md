@@ -208,6 +208,117 @@ Inherits from `BasicFeed` → `Feed`, adding GTFS-specific fields.
 
 ---
 
+## `GET /v1/search`
+
+Full-text search across all feed types. Search is performed on English words, is case insensitive, and word order is flexible.
+
+### Query Parameters
+
+| Parameter | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `limit` | integer | No | 10 | Number of items to return |
+| `offset` | integer | No | 0 | Offset for pagination |
+| `data_type` | string | No | — | Comma-separated filter: `gtfs`, `gtfs_rt`, `gbfs` |
+| `search_query` | string | No | — | Full-text search across provider names, feed names, and locations |
+
+### Example Request
+
+```bash
+curl -X GET \
+  'https://api.mobilitydatabase.org/v1/search?limit=10&offset=0&data_type=gtfs&search_query=Jaune' \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Bearer <token>'
+```
+
+### Response
+
+**200 OK** — Returns a `SearchResponse` object with total count and results array.
+
+```json
+{
+  "total": 7,
+  "results": [
+    {
+      "id": "tdg-80934",
+      "data_type": "gtfs",
+      "status": "active",
+      "created_at": "2025-12-10T14:31:34.456838Z",
+      "official": true,
+      "external_ids": [
+        { "external_id": "80934", "source": "tdg" }
+      ],
+      "provider": "Région Réunion",
+      "feed_name": "Réseau interurbain Cars Jaunes",
+      "note": null,
+      "feed_contact_email": null,
+      "source_info": {
+        "producer_url": "https://transport.data.gouv.fr/resources/80934/download?token=...",
+        "authentication_type": 0,
+        "authentication_info_url": null,
+        "api_key_parameter_name": null,
+        "license_url": "https://www.data.gouv.fr/pages/legal/licences/etalab-2.0",
+        "license_id": "etalab-2.0",
+        "license_is_spdx": true,
+        "license_notes": null
+      },
+      "redirects": [
+        { "target_id": "tdg-80934", "comment": "Redirecting post TDG import" }
+      ],
+      "locations": [
+        {
+          "country_code": "FR",
+          "country": "France",
+          "subdivision_name": "La Réunion",
+          "municipality": null
+        }
+      ],
+      "latest_dataset": {
+        "id": "tdg-80934-202603080038",
+        "hosted_url": "https://files.mobilitydatabase.org/tdg-80934/tdg-80934-202603080038/tdg-80934-202603080038.zip",
+        "bounding_box": null,
+        "downloaded_at": "2026-03-08T00:39:01.654230Z",
+        "hash": "8efc5bd233e5bf455f897c9a3706c76f7e8ba1854a4739c315d63f39cbf2a6d3",
+        "service_date_range_start": "2025-11-30T20:00:00Z",
+        "service_date_range_end": "2026-08-15T19:59:00Z",
+        "agency_timezone": "Indian/Reunion",
+        "zipped_folder_size_mb": null,
+        "unzipped_folder_size_mb": null,
+        "validation_report": {
+          "features": ["Bike Allowed", "Headsigns", "Route Colors", "Shapes"],
+          "total_error": 0,
+          "total_warning": 33974,
+          "total_info": 0,
+          "unique_error_count": 0,
+          "unique_warning_count": 4,
+          "unique_info_count": 0
+        }
+      },
+      "entity_types": null,
+      "versions": null,
+      "feed_references": null
+    }
+  ]
+}
+```
+
+### Response Schema: `SearchResponse`
+
+| Field | Type | Description |
+|---|---|---|
+| `total` | integer | Total number of matching results |
+| `results` | SearchFeedResult[] | Array of feed results |
+
+Each item in `results` shares the same schema as `GtfsFeed` (see above), with these additional fields for GTFS-RT results:
+
+| Field | Type | Description |
+|---|---|---|
+| `entity_types` | string[] \| null | GTFS-RT entity types: `tu` (trip updates), `vp` (vehicle positions), `sa` (service alerts) |
+| `feed_references` | string[] \| null | IDs of related GTFS feeds this RT feed references |
+
+**Note:** The `latest_dataset` field may be `null` for GTFS-RT feeds (which are real-time streams, not downloadable datasets).
+
+---
+
 ## Related Endpoints
 
 | Endpoint | Description |

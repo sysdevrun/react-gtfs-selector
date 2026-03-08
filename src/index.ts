@@ -6,6 +6,7 @@ export { SourceSearch } from './components/SourceSearch';
 export type { GtfsSelectionResult, GtfsSearchResult, GtfsSource } from './types';
 
 export { transportDataGouvFr } from './sources/transport-data-gouv-fr';
-export { mobilityData } from './sources/mobility-data';
+export { mobilityData, createMobilityDataSource } from './sources/mobility-data';
+export type { MobilityDataSourceOptions } from './sources/mobility-data';
 
 import './style.css';
