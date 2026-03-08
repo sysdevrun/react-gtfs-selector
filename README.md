@@ -40,7 +40,7 @@ function App() {
 The component shows a **tabbed interface**:
 
 1. **Import file** — drag & drop or click to browse for a GTFS `.zip` file
-2. **transport.data.gouv.fr** — search French public transit GTFS feeds
+2. **[transport.data.gouv.fr](https://transport.data.gouv.fr)** — search French public transit GTFS feeds
 3. **Mobility Database** — search worldwide GTFS feeds from the [Mobility Database](https://mobilitydatabase.org), available in two modes:
    - **CSV catalog** (`mobilityDataCsv`) — no authentication required, loads the full catalog CSV and filters locally
    - **API** (`createMobilityDataSource({ apiToken })`) — requires a Bearer token, searches server-side via the Mobility Database API
@@ -62,7 +62,7 @@ type GtfsSelectionResult =
   | { type: 'url'; url: string; title: string; gtfsRtUrls?: string[] };
 ```
 
-## transport.data.gouv.fr source
+## [transport.data.gouv.fr](https://transport.data.gouv.fr) source
 
 French public transit GTFS feeds, enabled by default. Datasets are cached in localStorage for 24h.
 
