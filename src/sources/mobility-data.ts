@@ -67,7 +67,7 @@ function toSearchResult(item: MobilityDataSearchResult): GtfsSearchResult | null
 export function createMobilityDataSource(options: MobilityDataSourceOptions): GtfsSource {
   return {
     id: 'mobility-data',
-    label: 'Mobility Database',
+    label: 'Mobility Database (API)',
     available: true,
 
     async fetchDatasets(): Promise<GtfsSearchResult[]> {
@@ -115,7 +115,7 @@ export function createMobilityDataSource(options: MobilityDataSourceOptions): Gt
 /** Default instance (unavailable — needs an API token). */
 export const mobilityData: GtfsSource = {
   id: 'mobility-data',
-  label: 'Mobility Database',
+  label: 'Mobility Database (API)',
   available: false,
 
   async fetchDatasets(): Promise<GtfsSearchResult[]> {
