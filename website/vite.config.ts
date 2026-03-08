@@ -5,6 +5,9 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
   base: '/react-gtfs-selector/',
+  worker: {
+    format: 'es',
+  },
   plugins: [
     react(),
     viteStaticCopy({
