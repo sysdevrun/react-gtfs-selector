@@ -1,5 +1,5 @@
-import { useState, useCallback, useRef } from 'react';
-import { GtfsSelector } from 'react-gtfs-selector';
+import { useState, useCallback, useRef, useMemo } from 'react';
+import { GtfsSelector, transportDataGouvFr, createMobilityDataSource } from 'react-gtfs-selector';
 import 'react-gtfs-selector/style.css';
 import type { GtfsSelectionResult } from 'react-gtfs-selector';
 import * as Comlink from 'comlink';
@@ -23,7 +23,16 @@ export function App() {
   const [phase, setPhase] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState<string | null>(null);
+  const [apiToken, setApiToken] = useState('');
   const workerRef = useRef<Comlink.Remote<GtfsWorkerApi> | null>(null);
+
+  const sources = useMemo(
+    () =>
+      apiToken.trim()
+        ? [transportDataGouvFr, createMobilityDataSource({ apiToken: apiToken.trim() })]
+        : undefined,
+    [apiToken],
+  );
 
   const handleSelect = useCallback(async (result: GtfsSelectionResult) => {
     setLoading(true);
@@ -93,8 +102,22 @@ export function App() {
         <p>Select a GTFS source to view transit routes</p>
       </header>
 
+      <div className="app__token">
+        <label className="app__token-label" htmlFor="mobility-token">
+          Mobility Database API token
+        </label>
+        <input
+          id="mobility-token"
+          className="app__token-input"
+          type="text"
+          placeholder="Paste your Bearer token to enable Mobility Database search"
+          value={apiToken}
+          onChange={(e) => setApiToken(e.target.value)}
+        />
+      </div>
+
       <div className="app__selector">
-        <GtfsSelector onSelect={handleSelect} />
+        <GtfsSelector onSelect={handleSelect} sources={sources} />
       </div>
 
       {loading && (
