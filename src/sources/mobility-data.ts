@@ -6,17 +6,27 @@ interface MobilityDataSearchResult {
   id: string;
   data_type: string;
   provider: string;
-  feed_name?: string;
+  feed_name?: string | null;
   status: string;
   source_info?: {
     producer_url?: string;
     license_url?: string;
   };
-  locations?: { country_code?: string; subdivision_name?: string; municipality?: string }[];
+  locations?: {
+    country_code?: string;
+    country?: string;
+    subdivision_name?: string | null;
+    municipality?: string | null;
+  }[];
   latest_dataset?: {
     id?: string;
     hosted_url?: string;
-  };
+  } | null;
+}
+
+interface MobilityDataSearchResponse {
+  total: number;
+  results: MobilityDataSearchResult[];
 }
 
 export interface MobilityDataSourceOptions {
@@ -35,7 +45,7 @@ function toSearchResult(item: MobilityDataSearchResult): GtfsSearchResult | null
     const loc = item.locations[0];
     if (loc.municipality) locationParts.push(loc.municipality);
     if (loc.subdivision_name) locationParts.push(loc.subdivision_name);
-    if (loc.country_code) locationParts.push(loc.country_code);
+    if (loc.country) locationParts.push(loc.country);
   }
 
   const title = item.feed_name
@@ -91,9 +101,9 @@ export function createMobilityDataSource(options: MobilityDataSourceOptions): Gt
         throw new Error(`Mobility Database API error: HTTP ${res.status}`);
       }
 
-      const raw: MobilityDataSearchResult[] = await res.json();
+      const data: MobilityDataSearchResponse = await res.json();
       const results: GtfsSearchResult[] = [];
-      for (const item of raw) {
+      for (const item of data.results) {
         const result = toSearchResult(item);
         if (result) results.push(result);
       }

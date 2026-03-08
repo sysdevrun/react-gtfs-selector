@@ -1,36 +1,41 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mobilityData, createMobilityDataSource } from './mobility-data';
 
-const mockApiResponse = [
-  {
-    id: 'mdb-100',
-    data_type: 'gtfs',
-    provider: 'Paris Metro',
-    feed_name: 'Bus',
-    status: 'active',
-    source_info: { producer_url: 'https://example.com/paris-bus.zip' },
-    locations: [
-      { country_code: 'FR', subdivision_name: 'Île-de-France', municipality: 'Paris' },
-    ],
-    latest_dataset: { id: 'ds-1', hosted_url: 'https://hosted.example.com/paris-bus.zip' },
-  },
-  {
-    id: 'mdb-200',
-    data_type: 'gtfs_rt',
-    provider: 'Lyon Transit',
-    status: 'active',
-    source_info: { producer_url: 'https://example.com/lyon-rt' },
-    locations: [{ country_code: 'FR', subdivision_name: 'Auvergne-Rhône-Alpes' }],
-  },
-  {
-    id: 'mdb-300',
-    data_type: 'gtfs',
-    provider: 'No URL Transit',
-    status: 'active',
-    source_info: {},
-    locations: [],
-  },
-];
+const mockApiResponse = {
+  total: 3,
+  results: [
+    {
+      id: 'mdb-100',
+      data_type: 'gtfs',
+      provider: 'Paris Metro',
+      feed_name: 'Bus',
+      status: 'active',
+      source_info: { producer_url: 'https://example.com/paris-bus.zip' },
+      locations: [
+        { country_code: 'FR', country: 'France', subdivision_name: 'Île-de-France', municipality: 'Paris' },
+      ],
+      latest_dataset: { id: 'ds-1', hosted_url: 'https://hosted.example.com/paris-bus.zip' },
+    },
+    {
+      id: 'mdb-200',
+      data_type: 'gtfs_rt',
+      provider: 'Lyon Transit',
+      status: 'active',
+      source_info: { producer_url: 'https://example.com/lyon-rt' },
+      locations: [{ country_code: 'FR', country: 'France', subdivision_name: 'Auvergne-Rhône-Alpes' }],
+      latest_dataset: null,
+    },
+    {
+      id: 'mdb-300',
+      data_type: 'gtfs',
+      provider: 'No URL Transit',
+      status: 'active',
+      source_info: {},
+      locations: [],
+      latest_dataset: null,
+    },
+  ],
+};
 
 beforeEach(() => {
   vi.restoreAllMocks();
@@ -66,7 +71,7 @@ describe('createMobilityDataSource', () => {
     } as Response);
 
     const source = createMobilityDataSource({ apiToken: 'my-token' });
-    const results = await source.asyncSearch!('Paris');
+    await source.asyncSearch!('Paris');
 
     expect(fetchSpy).toHaveBeenCalledOnce();
     const [url, init] = fetchSpy.mock.calls[0];
@@ -95,7 +100,7 @@ describe('createMobilityDataSource', () => {
       id: 'mdb-100',
       title: 'Paris Metro — Bus',
       url: 'https://hosted.example.com/paris-bus.zip',
-      area: 'Paris, Île-de-France, FR',
+      area: 'Paris, Île-de-France, France',
       extra: { status: 'active', data_type: 'gtfs' },
     });
 
@@ -103,7 +108,7 @@ describe('createMobilityDataSource', () => {
       id: 'mdb-200',
       title: 'Lyon Transit',
       url: 'https://example.com/lyon-rt',
-      area: 'Auvergne-Rhône-Alpes, FR',
+      area: 'Auvergne-Rhône-Alpes, France',
       extra: { status: 'active', data_type: 'gtfs_rt' },
     });
   });
@@ -131,17 +136,20 @@ describe('createMobilityDataSource', () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue({
       ok: true,
       json: () =>
-        Promise.resolve([
-          {
-            id: 'mdb-1',
-            data_type: 'gtfs',
-            provider: 'Test',
-            status: 'active',
-            source_info: { producer_url: 'https://producer.com/feed.zip' },
-            latest_dataset: { hosted_url: 'https://hosted.com/feed.zip' },
-            locations: [],
-          },
-        ]),
+        Promise.resolve({
+          total: 1,
+          results: [
+            {
+              id: 'mdb-1',
+              data_type: 'gtfs',
+              provider: 'Test',
+              status: 'active',
+              source_info: { producer_url: 'https://producer.com/feed.zip' },
+              latest_dataset: { hosted_url: 'https://hosted.com/feed.zip' },
+              locations: [],
+            },
+          ],
+        }),
     } as Response);
 
     const source = createMobilityDataSource({ apiToken: 'test' });
@@ -154,21 +162,52 @@ describe('createMobilityDataSource', () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue({
       ok: true,
       json: () =>
-        Promise.resolve([
-          {
-            id: 'mdb-2',
-            data_type: 'gtfs',
-            provider: 'Test',
-            status: 'active',
-            source_info: { producer_url: 'https://producer.com/feed.zip' },
-            locations: [],
-          },
-        ]),
+        Promise.resolve({
+          total: 1,
+          results: [
+            {
+              id: 'mdb-2',
+              data_type: 'gtfs',
+              provider: 'Test',
+              status: 'active',
+              source_info: { producer_url: 'https://producer.com/feed.zip' },
+              latest_dataset: null,
+              locations: [],
+            },
+          ],
+        }),
     } as Response);
 
     const source = createMobilityDataSource({ apiToken: 'test' });
     const results = await source.asyncSearch!('Test');
 
     expect(results[0].url).toBe('https://producer.com/feed.zip');
+  });
+
+  it('handles empty feed_name gracefully', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          total: 1,
+          results: [
+            {
+              id: 'mdb-3',
+              data_type: 'gtfs',
+              provider: 'Some Provider',
+              feed_name: '',
+              status: 'active',
+              source_info: { producer_url: 'https://example.com/feed.zip' },
+              locations: [],
+            },
+          ],
+        }),
+    } as Response);
+
+    const source = createMobilityDataSource({ apiToken: 'test' });
+    const results = await source.asyncSearch!('Some');
+
+    // Empty feed_name should not appear in title
+    expect(results[0].title).toBe('Some Provider');
   });
 });
