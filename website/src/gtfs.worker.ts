@@ -28,13 +28,14 @@ const workerApi = {
       options.onProgress = progressCallback;
     }
 
+    const skipFiles = ['shapes.txt', 'trips.txt', 'stop_times.txt'];
     if (typeof data === 'string') {
-      gtfs = await GtfsSqlJs.fromZip(data, options);
+      gtfs = await GtfsSqlJs.fromZip(data, { ...options, skipFiles });
     } else {
       // fromZip internally accepts ArrayBuffer despite string type signature
       gtfs = await (GtfsSqlJs as unknown as {
-        fromZip: (data: ArrayBuffer, opts: typeof options) => Promise<GtfsSqlJs>;
-      }).fromZip(data, options);
+        fromZip: (data: ArrayBuffer, opts: typeof options & { skipFiles?: string[] }) => Promise<GtfsSqlJs>;
+      }).fromZip(data, { ...options, skipFiles });
     }
   },
 
