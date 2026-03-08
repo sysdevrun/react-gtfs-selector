@@ -8,15 +8,21 @@ interface SourceSearchProps {
 
 export function SourceSearch({ source, onSelect }: SourceSearchProps) {
   const [datasets, setDatasets] = useState<GtfsSearchResult[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!source.asyncSearch);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [asyncResults, setAsyncResults] = useState<GtfsSearchResult[]>([]);
+  const [asyncSearching, setAsyncSearching] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLUListElement>(null);
 
+  const isAsync = !!source.asyncSearch;
+
+  // Fetch all datasets upfront for sync sources
   useEffect(() => {
+    if (isAsync) return;
     let cancelled = false;
     setLoading(true);
     setError(null);
@@ -39,12 +45,46 @@ export function SourceSearch({ source, onSelect }: SourceSearchProps) {
     return () => {
       cancelled = true;
     };
-  }, [source]);
+  }, [source, isAsync]);
 
-  const filtered = useMemo(
-    () => source.search(datasets, query),
-    [source, datasets, query],
-  );
+  // Debounced async search for sources with asyncSearch
+  useEffect(() => {
+    if (!isAsync || !source.asyncSearch) return;
+    if (query.length < 2) {
+      setAsyncResults([]);
+      return;
+    }
+
+    let cancelled = false;
+    setAsyncSearching(true);
+
+    const timer = setTimeout(() => {
+      source
+        .asyncSearch!(query)
+        .then((results) => {
+          if (!cancelled) {
+            setAsyncResults(results);
+            setAsyncSearching(false);
+          }
+        })
+        .catch((err) => {
+          if (!cancelled) {
+            setError(String(err));
+            setAsyncSearching(false);
+          }
+        });
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [source, isAsync, query]);
+
+  const filtered = useMemo(() => {
+    if (isAsync) return asyncResults;
+    return source.search(datasets, query);
+  }, [isAsync, asyncResults, source, datasets, query]);
 
   useEffect(() => {
     setActiveIndex(-1);
@@ -116,7 +156,7 @@ export function SourceSearch({ source, onSelect }: SourceSearchProps) {
     );
   }
 
-  if (error) {
+  if (error && !isAsync) {
     return (
       <div className="rgs-source-search">
         <p className="rgs-source-search__error" role="alert">
@@ -144,7 +184,13 @@ export function SourceSearch({ source, onSelect }: SourceSearchProps) {
       />
       {open && query.length >= 2 && (
         <ul className="rgs-source-search__results" ref={resultsRef} role="listbox">
-          {filtered.length === 0 ? (
+          {asyncSearching ? (
+            <li className="rgs-source-search__empty">Searching...</li>
+          ) : error ? (
+            <li className="rgs-source-search__empty rgs-source-search__error" role="alert">
+              Search failed: {error}
+            </li>
+          ) : filtered.length === 0 ? (
             <li className="rgs-source-search__empty">No dataset found</li>
           ) : (
             filtered.map((result, idx) => (

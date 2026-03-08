@@ -96,6 +96,46 @@ describe('SourceSearch', () => {
     );
   });
 
+  it('shows input immediately for async search sources (no loading)', async () => {
+    const asyncSource = createMockSource({
+      asyncSearch: vi.fn().mockResolvedValue([]),
+    });
+    render(<SourceSearch source={asyncSource} onSelect={vi.fn()} />);
+
+    // Should show input immediately, no loading state
+    expect(screen.getByTestId('source-search-input')).toBeInTheDocument();
+    expect(screen.queryByText(/Loading datasets/)).not.toBeInTheDocument();
+  });
+
+  it('uses asyncSearch for results when available', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const asyncSearchFn = vi.fn().mockResolvedValue([
+      { id: 'a1', title: 'Async Result', url: 'https://example.com/async.zip', area: 'Paris' },
+    ]);
+    const asyncSource = createMockSource({ asyncSearch: asyncSearchFn });
+    const onSelect = vi.fn();
+    render(<SourceSearch source={asyncSource} onSelect={onSelect} />);
+
+    await user.type(screen.getByTestId('source-search-input'), 'Paris');
+
+    // Wait for debounce
+    await vi.advanceTimersByTimeAsync(350);
+
+    await waitFor(() => {
+      expect(screen.getByText('Async Result')).toBeInTheDocument();
+    });
+
+    expect(asyncSearchFn).toHaveBeenCalledWith('Paris');
+
+    await user.click(screen.getByText('Async Result'));
+    expect(onSelect).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'a1', title: 'Async Result' }),
+    );
+
+    vi.useRealTimers();
+  });
+
   it('supports keyboard navigation', async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();

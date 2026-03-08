@@ -25,4 +25,9 @@ export interface GtfsSource {
   fetchDatasets(): Promise<GtfsSearchResult[]>;
   /** Filter datasets by query string */
   search(datasets: GtfsSearchResult[], query: string): GtfsSearchResult[];
+  /**
+   * Optional server-side search. When provided, SourceSearch will use this
+   * instead of fetchDatasets + search for a debounced async search experience.
+   */
+  asyncSearch?(query: string): Promise<GtfsSearchResult[]>;
 }
