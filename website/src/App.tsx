@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
-import { GtfsSelector, transportDataGouvFr, createMobilityDataSource, mobilityData } from 'react-gtfs-selector';
+import { GtfsSelector, transportDataGouvFr, mobilityDataCsv, createMobilityDataSource, mobilityData } from 'react-gtfs-selector';
 import 'react-gtfs-selector/style.css';
 import type { GtfsSelectionResult } from 'react-gtfs-selector';
 import * as Comlink from 'comlink';
@@ -42,8 +42,8 @@ export function App() {
   const sources = useMemo(
     () =>
       apiToken.trim()
-        ? [transportDataGouvFr, createMobilityDataSource({ apiToken: apiToken.trim() })]
-        : [transportDataGouvFr, { ...mobilityData, unavailableMessage: 'Waiting for token' }],
+        ? [transportDataGouvFr, mobilityDataCsv, createMobilityDataSource({ apiToken: apiToken.trim() })]
+        : [transportDataGouvFr, mobilityDataCsv, { ...mobilityData, unavailableMessage: 'Waiting for token' }],
     [apiToken],
   );
 
