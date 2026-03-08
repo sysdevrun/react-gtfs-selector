@@ -85,7 +85,7 @@ export function createMobilityDataSource(options: MobilityDataSourceOptions): Gt
 
       const params = new URLSearchParams({
         search_query: query,
-        data_type: 'gtfs,gtfs_rt',
+        data_type: 'gtfs',
         limit: '30',
         offset: '0',
       });

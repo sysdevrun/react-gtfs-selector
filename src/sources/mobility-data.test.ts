@@ -77,7 +77,7 @@ describe('createMobilityDataSource', () => {
     const [url, init] = fetchSpy.mock.calls[0];
     expect(String(url)).toContain('/v1/search?');
     expect(String(url)).toContain('search_query=Paris');
-    expect(String(url)).toContain('data_type=gtfs%2Cgtfs_rt');
+    expect(String(url)).toContain('data_type=gtfs');
     expect(String(url)).toContain('limit=30');
     expect((init as RequestInit).headers).toEqual(
       expect.objectContaining({ Authorization: 'Bearer my-token' }),
