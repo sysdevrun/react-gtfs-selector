@@ -2,11 +2,19 @@ import { useState, useCallback, useRef } from 'react';
 import { GtfsSelector } from 'react-gtfs-selector';
 import 'react-gtfs-selector/style.css';
 import type { GtfsSelectionResult } from 'react-gtfs-selector';
-import { GtfsSqlJs } from 'gtfs-sqljs';
+import * as Comlink from 'comlink';
 import type { Route } from 'gtfs-sqljs';
+import type { GtfsWorkerApi } from './gtfs.worker';
 import { getProxyUrl } from './proxy';
 import { RouteList } from './RouteList';
 import './App.css';
+
+function createWorker() {
+  const raw = new Worker(new URL('./gtfs.worker.ts', import.meta.url), {
+    type: 'module',
+  });
+  return Comlink.wrap<GtfsWorkerApi>(raw);
+}
 
 export function App() {
   const [routes, setRoutes] = useState<Route[] | null>(null);
@@ -15,7 +23,7 @@ export function App() {
   const [phase, setPhase] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState<string | null>(null);
-  const gtfsRef = useRef<GtfsSqlJs | null>(null);
+  const workerRef = useRef<Comlink.Remote<GtfsWorkerApi> | null>(null);
 
   const handleSelect = useCallback(async (result: GtfsSelectionResult) => {
     setLoading(true);
@@ -23,42 +31,43 @@ export function App() {
     setError(null);
     setRoutes(null);
 
-    // Close previous instance
-    if (gtfsRef.current) {
-      gtfsRef.current.close();
-      gtfsRef.current = null;
+    // Close previous instance in worker
+    if (workerRef.current) {
+      await workerRef.current.close();
     }
 
-    const locateFile = (file: string) => import.meta.env.BASE_URL + file;
-    const onProgress = (info: { percentComplete: number; phase: string }) => {
-      setProgress(info.percentComplete);
-      setPhase(info.phase);
-    };
+    // Create a fresh worker (or reuse)
+    if (!workerRef.current) {
+      workerRef.current = createWorker();
+    }
+
+    const worker = workerRef.current;
+    const wasmUrl = import.meta.env.BASE_URL + 'sql-wasm-browser.wasm';
+
+    const onProgress = Comlink.proxy(
+      (info: { percentComplete: number; phase: string }) => {
+        setProgress(info.percentComplete);
+        setPhase(info.phase);
+      },
+    );
 
     try {
-      let gtfs: GtfsSqlJs;
-
       if (result.type === 'url') {
         setTitle(result.title);
         const proxiedUrl = getProxyUrl(result.url);
-        gtfs = await GtfsSqlJs.fromZip(proxiedUrl, {
-          locateFile,
-          onProgress,
-        });
+        await worker.loadFromZip(proxiedUrl, wasmUrl, onProgress);
       } else {
         setTitle(result.fileName);
         const arrayBuffer = await result.blob.arrayBuffer();
-        // fromZip internally accepts ArrayBuffer despite string type signature
-        gtfs = await (GtfsSqlJs as unknown as {
-          fromZip: (data: ArrayBuffer, opts: Record<string, unknown>) => Promise<GtfsSqlJs>;
-        }).fromZip(arrayBuffer, {
-          locateFile,
+        await worker.loadFromZip(
+          Comlink.transfer(arrayBuffer, [arrayBuffer]),
+          wasmUrl,
           onProgress,
-        });
+        );
       }
 
-      gtfsRef.current = gtfs;
-      setRoutes(gtfs.getRoutes());
+      const fetchedRoutes = await worker.getRoutes();
+      setRoutes(fetchedRoutes);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load GTFS data');
     } finally {
