@@ -112,6 +112,36 @@ const mySource: GtfsSource = {
 <GtfsSelector onSelect={handleSelect} sources={[mySource]} />
 ```
 
+## Loading GTFS data
+
+Once the user selects a source, use [`gtfs-sqljs`](https://www.npmjs.com/package/gtfs-sqljs) to load and query the GTFS data:
+
+```tsx
+import { GtfsSelector } from 'react-gtfs-selector';
+import { GtfsSqlJs } from 'gtfs-sqljs';
+import type { GtfsSelectionResult } from 'react-gtfs-selector';
+
+function App() {
+  const handleSelect = async (result: GtfsSelectionResult) => {
+    let gtfs: GtfsSqlJs;
+
+    if (result.type === 'url') {
+      gtfs = await GtfsSqlJs.fromZip(result.url);
+    } else {
+      const data = await result.blob.arrayBuffer();
+      gtfs = await GtfsSqlJs.fromZipData(data);
+    }
+
+    const routes = gtfs.getRoutes();
+    console.log('Routes:', routes);
+
+    gtfs.close();
+  };
+
+  return <GtfsSelector onSelect={handleSelect} />;
+}
+```
+
 ## Styling
 
 Import `react-gtfs-selector/style.css` for default styles. All CSS classes are prefixed with `rgs-`. Pass `styled={false}` to opt out entirely and provide your own styles.
