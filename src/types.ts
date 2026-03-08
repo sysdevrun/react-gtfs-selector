@@ -21,7 +21,7 @@ export interface GtfsSource {
   label: string;
   /** Whether this source is ready to use */
   available: boolean;
-  /** Message shown when the source is unavailable (defaults to "Coming soon") */
+  /** Message shown when the source is unavailable (defaults to "Unavailable") */
   unavailableMessage?: string;
   /** Fetch all datasets (may use caching internally) */
   fetchDatasets(): Promise<GtfsSearchResult[]>;
