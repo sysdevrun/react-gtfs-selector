@@ -8,5 +8,6 @@ export type { GtfsSelectionResult, GtfsSearchResult, GtfsSource } from './types'
 export { transportDataGouvFr } from './sources/transport-data-gouv-fr';
 export { mobilityData, createMobilityDataSource } from './sources/mobility-data';
 export type { MobilityDataSourceOptions } from './sources/mobility-data';
+export { mobilityDataCsv } from './sources/mobility-data-csv';
 
 import './style.css';
