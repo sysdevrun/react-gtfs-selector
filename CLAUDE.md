@@ -35,3 +35,11 @@ React component library for selecting GTFS transit data sources. Provides a tabb
 ## Testing
 
 Tests are in `*.test.tsx` / `*.test.ts` files colocated with source. Uses Vitest with jsdom environment. The test setup polyfills `scrollIntoView` for jsdom compatibility.
+
+## Changelog
+
+Every user-facing change (feature, fix, breaking change) must be documented in `CHANGELOG.md` under the `[Unreleased]` section, following the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format.
+
+## Release process
+
+npm publication is triggered automatically when a GitHub release is created. Do not publish manually.
