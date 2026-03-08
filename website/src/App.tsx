@@ -1,5 +1,5 @@
-import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
-import { GtfsSelector, transportDataGouvFr, mobilityDataCsv, createMobilityDataSource, mobilityData } from 'react-gtfs-selector';
+import { useState, useCallback, useRef } from 'react';
+import { GtfsSelector, transportDataGouvFr, mobilityDataCsv } from 'react-gtfs-selector';
 import 'react-gtfs-selector/style.css';
 import type { GtfsSelectionResult } from 'react-gtfs-selector';
 import * as Comlink from 'comlink';
@@ -9,7 +9,7 @@ import { getProxyUrl } from './proxy';
 import { RouteList } from './RouteList';
 import './App.css';
 
-const TOKEN_STORAGE_KEY = 'rgs-mobility-api-token';
+const sources = [transportDataGouvFr, mobilityDataCsv];
 
 function createWorker() {
   const raw = new Worker(new URL('./gtfs.worker.ts', import.meta.url), {
@@ -25,27 +25,7 @@ export function App() {
   const [phase, setPhase] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState<string | null>(null);
-  const [apiToken, setApiToken] = useState(
-    () => localStorage.getItem(TOKEN_STORAGE_KEY) ?? '',
-  );
   const workerRef = useRef<Comlink.Remote<GtfsWorkerApi> | null>(null);
-
-  useEffect(() => {
-    const trimmed = apiToken.trim();
-    if (trimmed) {
-      localStorage.setItem(TOKEN_STORAGE_KEY, trimmed);
-    } else {
-      localStorage.removeItem(TOKEN_STORAGE_KEY);
-    }
-  }, [apiToken]);
-
-  const sources = useMemo(
-    () =>
-      apiToken.trim()
-        ? [transportDataGouvFr, mobilityDataCsv, createMobilityDataSource({ apiToken: apiToken.trim() })]
-        : [transportDataGouvFr, mobilityDataCsv, { ...mobilityData, unavailableMessage: 'Waiting for token' }],
-    [apiToken],
-  );
 
   const handleSelect = useCallback(async (result: GtfsSelectionResult) => {
     setLoading(true);
@@ -77,12 +57,12 @@ export function App() {
       if (result.type === 'url') {
         setTitle(result.title);
         const proxiedUrl = getProxyUrl(result.url);
-        await worker.loadFromZip(proxiedUrl, wasmUrl, onProgress);
+        await worker.loadFromZip({ type: 'url', url: proxiedUrl }, wasmUrl, onProgress);
       } else {
         setTitle(result.fileName);
         const arrayBuffer = await result.blob.arrayBuffer();
         await worker.loadFromZip(
-          Comlink.transfer(arrayBuffer, [arrayBuffer]),
+          Comlink.transfer({ type: 'data', data: arrayBuffer }, [arrayBuffer]),
           wasmUrl,
           onProgress,
         );
@@ -114,20 +94,6 @@ export function App() {
         </h1>
         <p>Select a GTFS source to view transit routes</p>
       </header>
-
-      <div className="app__token">
-        <label className="app__token-label" htmlFor="mobility-token">
-          Mobility Database API token
-        </label>
-        <input
-          id="mobility-token"
-          className="app__token-input"
-          type="text"
-          placeholder="Paste your Bearer token to enable Mobility Database search"
-          value={apiToken}
-          onChange={(e) => setApiToken(e.target.value)}
-        />
-      </div>
 
       <div className="app__selector">
         <GtfsSelector onSelect={handleSelect} sources={sources} />

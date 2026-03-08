@@ -2,11 +2,15 @@ import * as Comlink from 'comlink';
 import { GtfsSqlJs } from 'gtfs-sqljs';
 import type { Route } from 'gtfs-sqljs';
 
+export type LoadInput =
+  | { type: 'url'; url: string }
+  | { type: 'data'; data: ArrayBuffer };
+
 let gtfs: GtfsSqlJs | null = null;
 
 const workerApi = {
   async loadFromZip(
-    data: string | ArrayBuffer,
+    input: LoadInput,
     locateFile: string,
     progressCallback?: (info: { percentComplete: number; phase: string }) => void,
   ): Promise<void> {
@@ -29,13 +33,10 @@ const workerApi = {
     }
 
     const skipFiles = ['shapes.txt', 'trips.txt', 'stop_times.txt'];
-    if (typeof data === 'string') {
-      gtfs = await GtfsSqlJs.fromZip(data, { ...options, skipFiles });
+    if (input.type === 'url') {
+      gtfs = await GtfsSqlJs.fromZip(input.url, { ...options, skipFiles });
     } else {
-      // fromZip internally accepts ArrayBuffer despite string type signature
-      gtfs = await (GtfsSqlJs as unknown as {
-        fromZip: (data: ArrayBuffer, opts: typeof options & { skipFiles?: string[] }) => Promise<GtfsSqlJs>;
-      }).fromZip(data, { ...options, skipFiles });
+      gtfs = await GtfsSqlJs.fromZipData(input.data, { ...options, skipFiles });
     }
   },
 
