@@ -23,6 +23,20 @@ body {
 .app__header h1 {
   margin: 0 0 0.25rem;
   font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.app__github-link {
+  color: #333;
+  transition: color 0.15s;
+  display: inline-flex;
+}
+
+.app__github-link:hover {
+  color: #0066cc;
 }
 
 .app__header p {
