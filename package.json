@@ -1,6 +1,6 @@
 {
   "name": "react-gtfs-selector",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "React component to select a GTFS source via file drag-and-drop or online search",
   "author": "Théophile Helleboid <contact@sys-dev-run.fr>",
   "license": "MIT",
