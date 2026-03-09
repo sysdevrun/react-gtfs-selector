@@ -1,4 +1,3 @@
-import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
@@ -19,9 +18,4 @@ export default defineConfig({
       ],
     }),
   ],
-  resolve: {
-    alias: {
-      'react-gtfs-selector/style.css': path.resolve(__dirname, '../src/style.css'),
-    },
-  },
 });
