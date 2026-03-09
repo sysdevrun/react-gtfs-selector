@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import type { GtfsSource, GtfsSelectionResult, GtfsSearchResult } from '../types';
 import { transportDataGouvFr } from '../sources/transport-data-gouv-fr';
-import { mobilityData } from '../sources/mobility-data';
+import { mobilityDataCsv } from '../sources/mobility-data-csv';
 import { DropZone } from './DropZone';
 import { SourceSearch } from './SourceSearch';
 
@@ -28,7 +28,7 @@ export function GtfsSelector({
   className,
 }: GtfsSelectorProps) {
   const allSources = useMemo(
-    () => sources ?? [transportDataGouvFr, mobilityData],
+    () => sources ?? [transportDataGouvFr, mobilityDataCsv],
     [sources],
   );
 

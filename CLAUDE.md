@@ -9,7 +9,8 @@ React component library for selecting GTFS transit data sources. Provides a tabb
 - **`src/types.ts`** — Core types: `GtfsSelectionResult`, `GtfsSearchResult`, `GtfsSource` interface
 - **`src/sources/`** — Source plugins implementing `GtfsSource`
   - `transport-data-gouv-fr.ts` — French open transit data (fully implemented)
-  - `mobility-data.ts` — Mobility Database (server-side search via `api.mobilitydatabase.org/v1/search`, requires API token)
+  - `mobility-data-csv.ts` — Mobility Database CSV source (default, no token needed)
+  - `mobility-data.ts` — Mobility Database API source (server-side search, requires API token)
 - **`src/components/`** — React components
   - `GtfsSelector.tsx` — Main component with tabbed layout
   - `DropZone.tsx` — File drag-and-drop area
@@ -30,7 +31,7 @@ React component library for selecting GTFS transit data sources. Provides a tabb
 - **Single callback**: `onSelect` receives a discriminated union (`type: 'file' | 'url'`) so consumers handle both cases in one place.
 - **CSS opt-out**: Default styles ship with the component via `react-gtfs-selector/style.css`. All classes prefixed `rgs-`. Pass `styled={false}` to disable class names entirely.
 - **transport.data.gouv.fr caching**: Datasets cached in localStorage for 24h to avoid repeated API calls.
-- **Mobility Database**: Uses `createMobilityDataSource({ apiToken })` factory. Requires a Bearer token from `mobilitydatabase.org`. The default `mobilityData` export is unavailable; pass a configured instance via the `sources` prop.
+- **Mobility Database**: Default source uses `mobilityDataCsv` (CSV from `files.mobilitydatabase.org`, no token needed, cached in localStorage for 24h). The API-based `createMobilityDataSource({ apiToken })` factory is still available for server-side search but requires a Bearer token.
 
 ## Testing
 

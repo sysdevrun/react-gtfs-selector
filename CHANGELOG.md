@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Default Mobility Database source now uses the CSV-based `mobilityDataCsv` instead of the API-based `mobilityData` (no API token required out of the box)
+
 ## [0.2.1] - 2026-03-09
 
 ### Fixed
