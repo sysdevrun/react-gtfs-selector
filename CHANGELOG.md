@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-03-09
+
+### Added
+
+- `mobilityDataCsv` source using the public CORS-enabled CSV from `files.mobilitydatabase.org`, no API token required
+- CSV parsing via papaparse with localStorage caching (24h)
+
+### Changed
+
+- Renamed API-based Mobility Database tab to "Mobility Database (API)" for clarity
+
+### Fixed
+
+- Dropdown menu clipped by `overflow: hidden` on `.rgs-selector` container
+
 ## [0.1.0] - 2025-03-08
 
 ### Added
