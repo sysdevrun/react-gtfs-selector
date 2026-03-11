@@ -82,6 +82,43 @@
   color: #d32f2f;
 }
 
+/* URL input */
+.rgs-url-input {
+  display: flex;
+  gap: 8px;
+}
+
+.rgs-url-input input {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.rgs-url-input input:focus {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.15);
+}
+
+.rgs-url-input button {
+  padding: 10px 20px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  background: #0066cc;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.rgs-url-input button:hover {
+  background: #0052a3;
+}
+
 /* Source search */
 .rgs-source-search {
   position: relative;
