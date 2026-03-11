@@ -4,6 +4,7 @@ import { transportDataGouvFr } from '../sources/transport-data-gouv-fr';
 import { mobilityDataCsv } from '../sources/mobility-data-csv';
 import { DropZone } from './DropZone';
 import { SourceSearch } from './SourceSearch';
+import { UrlInput } from './UrlInput';
 
 export interface GtfsSelectorProps {
   /** Called when a GTFS source is selected (file dropped or URL picked) */
@@ -67,6 +68,14 @@ export function GtfsSelector({
         >
           Import file
         </button>
+        <button
+          className={`${cls('rgs-selector__tab')} ${activeTab === 'url' ? cls('rgs-selector__tab--active') : ''}`}
+          role="tab"
+          aria-selected={activeTab === 'url'}
+          onClick={() => setActiveTab('url')}
+        >
+          Load from URL
+        </button>
         {allSources.map((source) => (
           <button
             key={source.id}
@@ -83,6 +92,8 @@ export function GtfsSelector({
       <div className={cls('rgs-selector__panel')} role="tabpanel">
         {activeTab === 'file' ? (
           <DropZone onFile={handleFile} />
+        ) : activeTab === 'url' ? (
+          <UrlInput onSelect={onSelect} className={cls('rgs-url-input')} />
         ) : (
           (() => {
             const source = allSources.find((s) => s.id === activeTab);

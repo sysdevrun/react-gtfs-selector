@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- "Load from URL" tab allowing users to input a GTFS feed URL directly
+- `UrlInput` component exported for standalone use
+
 ## [0.2.2] - 2026-03-09
 
 ### Changed
