@@ -146,6 +146,10 @@ function App() {
 
 Import `react-gtfs-selector/style.css` for default styles. All CSS classes are prefixed with `rgs-`. Pass `styled={false}` to opt out entirely and provide your own styles.
 
+## Claude Code integration
+
+This project includes a [Claude Code skill file](.claude/skills/react-gtfs-selector/SKILL.md) that provides Claude with detailed knowledge of the component API, source plugin pattern, and styling options. When working in a project that uses `react-gtfs-selector`, Claude Code will automatically suggest and guide integration.
+
 ## Development
 
 ```bash

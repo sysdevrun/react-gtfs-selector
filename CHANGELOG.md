@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Claude Code skill file (`.claude/skills/react-gtfs-selector/SKILL.md`) with integration guide, API reference, custom source plugin guide, styling docs, and code examples
+
 ## [0.3.0] - 2026-03-11
 
 ### Added
