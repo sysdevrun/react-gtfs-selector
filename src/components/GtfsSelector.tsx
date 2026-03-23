@@ -66,14 +66,6 @@ export function GtfsSelector({
         >
           Import file
         </button>
-        <button
-          className={`${cls('rgs-selector__tab')} ${activeTab === 'url' ? cls('rgs-selector__tab--active') : ''}`}
-          role="tab"
-          aria-selected={activeTab === 'url'}
-          onClick={() => setActiveTab('url')}
-        >
-          Load from URL
-        </button>
         {allSources.map((source) => (
           <button
             key={source.id}
@@ -85,6 +77,14 @@ export function GtfsSelector({
             {source.label}
           </button>
         ))}
+        <button
+          className={`${cls('rgs-selector__tab')} ${activeTab === 'url' ? cls('rgs-selector__tab--active') : ''}`}
+          role="tab"
+          aria-selected={activeTab === 'url'}
+          onClick={() => setActiveTab('url')}
+        >
+          Load from URL
+        </button>
       </div>
 
       <div className={cls('rgs-selector__panel')} role="tabpanel">

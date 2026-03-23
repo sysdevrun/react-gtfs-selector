@@ -1,6 +1,6 @@
 import * as Comlink from 'comlink';
 import { GtfsSqlJs } from 'gtfs-sqljs';
-import type { Route } from 'gtfs-sqljs';
+import type { Route, Agency } from 'gtfs-sqljs';
 
 export type LoadInput =
   | { type: 'url'; url: string }
@@ -43,6 +43,11 @@ const workerApi = {
   getRoutes(): Route[] {
     if (!gtfs) throw new Error('GTFS not loaded');
     return gtfs.getRoutes();
+  },
+
+  getAgencies(): Agency[] {
+    if (!gtfs) throw new Error('GTFS not loaded');
+    return gtfs.getAgencies();
   },
 
   close(): void {

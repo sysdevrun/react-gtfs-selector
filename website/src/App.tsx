@@ -3,13 +3,13 @@ import { GtfsSelector, transportDataGouvFr, mobilityDataCsv } from 'react-gtfs-s
 import 'react-gtfs-selector/style.css';
 import type { GtfsSelectionResult } from 'react-gtfs-selector';
 import * as Comlink from 'comlink';
-import type { Route } from 'gtfs-sqljs';
+import type { Route, Agency } from 'gtfs-sqljs';
 import type { GtfsWorkerApi } from './gtfs.worker';
 import { getProxyUrl } from './proxy';
 import { RouteList } from './RouteList';
 import './App.css';
 
-const sources = [transportDataGouvFr, mobilityDataCsv];
+const sources = [mobilityDataCsv, transportDataGouvFr];
 
 function createWorker() {
   const raw = new Worker(new URL('./gtfs.worker.ts', import.meta.url), {
@@ -25,6 +25,9 @@ export function App() {
   const [phase, setPhase] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState<string | null>(null);
+  const [gtfsUrl, setGtfsUrl] = useState<string | null>(null);
+  const [gtfsRtUrls, setGtfsRtUrls] = useState<string[]>([]);
+  const [agencies, setAgencies] = useState<Agency[]>([]);
   const workerRef = useRef<Comlink.Remote<GtfsWorkerApi> | null>(null);
 
   const handleSelect = useCallback(async (result: GtfsSelectionResult) => {
@@ -32,6 +35,9 @@ export function App() {
     setProgress(0);
     setError(null);
     setRoutes(null);
+    setAgencies([]);
+    setGtfsUrl(null);
+    setGtfsRtUrls([]);
 
     // Close previous instance in worker
     if (workerRef.current) {
@@ -56,6 +62,8 @@ export function App() {
     try {
       if (result.type === 'url') {
         setTitle(result.title);
+        setGtfsUrl(result.url);
+        setGtfsRtUrls(result.gtfsRtUrls ?? []);
         const proxiedUrl = getProxyUrl(result.url);
         await worker.loadFromZip({ type: 'url', url: proxiedUrl }, wasmUrl, onProgress);
       } else {
@@ -69,7 +77,9 @@ export function App() {
       }
 
       const fetchedRoutes = await worker.getRoutes();
+      const fetchedAgencies = await worker.getAgencies();
       setRoutes(fetchedRoutes);
+      setAgencies(fetchedAgencies);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load GTFS data');
     } finally {
@@ -118,6 +128,39 @@ export function App() {
       {routes && (
         <div className="app__results">
           {title && <h2 className="app__results-title">{title}</h2>}
+
+          {gtfsUrl && (
+            <div className="app__feed-urls">
+              <div className="app__feed-url">
+                <span className="app__feed-url-label">GTFS</span>
+                <a href={gtfsUrl} className="app__feed-url-link">{gtfsUrl}</a>
+              </div>
+              {gtfsRtUrls.map((url) => (
+                <div key={url} className="app__feed-url">
+                  <span className="app__feed-url-label">GTFS-RT</span>
+                  <a href={url} className="app__feed-url-link">{url}</a>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {agencies.length > 0 && (
+            <div className="app__agencies">
+              {agencies.map((agency) => (
+                <div key={agency.agency_id} className="app__agency">
+                  <span className="app__agency-name">
+                    {agency.agency_url ? (
+                      <a href={agency.agency_url} target="_blank" rel="noopener noreferrer">{agency.agency_name}</a>
+                    ) : agency.agency_name}
+                  </span>
+                  <span className="app__agency-details">
+                    {[agency.agency_timezone, agency.agency_phone].filter(Boolean).join(' \u00b7 ')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
           <RouteList routes={routes} />
         </div>
       )}
