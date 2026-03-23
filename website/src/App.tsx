@@ -93,6 +93,16 @@ export function App() {
         <h1>
           react-gtfs-selector
           <a
+            href="https://www.npmjs.com/package/react-gtfs-selector"
+            className="app__github-link"
+            aria-label="npm package"
+          >
+            <svg viewBox="0 0 780 250" width="42" height="14" fill="currentColor" aria-hidden="true">
+              <path d="M240 250h100V50h100v200h100V0H240zM0 0v250h240V0zm140 200H100V50h40z" />
+              <path d="M640 50v150h-50V50h-50v150h-50V0h250v200h-50V50z" />
+            </svg>
+          </a>
+          <a
             href="https://github.com/sysdevrun/react-gtfs-selector"
             className="app__github-link"
             aria-label="GitHub repository"
