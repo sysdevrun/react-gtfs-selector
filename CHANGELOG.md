@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-03-23
+
+### Changed
+
+- **BREAKING:** `GtfsSelector` no longer includes any sources by default. Pass sources explicitly via the `sources` prop (e.g. `sources={[transportDataGouvFr, mobilityDataCsv]}`)
+
 ### Added
 
 - Claude Code skill file (`.claude/skills/react-gtfs-selector/SKILL.md`) with integration guide, API reference, custom source plugin guide, styling docs, and code examples

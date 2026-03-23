@@ -19,7 +19,7 @@ npm install react-gtfs-selector
 ## Usage
 
 ```tsx
-import { GtfsSelector } from 'react-gtfs-selector';
+import { GtfsSelector, transportDataGouvFr, mobilityDataCsv } from 'react-gtfs-selector';
 import 'react-gtfs-selector/style.css'; // optional — bundled default styles
 
 function App() {
@@ -32,6 +32,7 @@ function App() {
           console.log('Got URL:', result.title, result.url);
         }
       }}
+      sources={[transportDataGouvFr, mobilityDataCsv]}
     />
   );
 }
@@ -40,17 +41,15 @@ function App() {
 The component shows a **tabbed interface**:
 
 1. **Import file** — drag & drop or click to browse for a GTFS `.zip` file
-2. **[transport.data.gouv.fr](https://transport.data.gouv.fr)** — search French public transit GTFS feeds
-3. **Mobility Database** — search worldwide GTFS feeds from the [Mobility Database](https://mobilitydatabase.org), available in two modes:
-   - **CSV catalog** (`mobilityDataCsv`) — no authentication required, loads the full catalog CSV and filters locally
-   - **API** (`createMobilityDataSource({ apiToken })`) — requires a Bearer token, searches server-side via the Mobility Database API
+2. **Load from URL** — paste a direct GTFS feed URL
+3. One tab per source plugin passed via the `sources` prop
 
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `onSelect` | `(result: GtfsSelectionResult) => void` | *required* | Callback when a source is selected |
-| `sources` | `GtfsSource[]` | built-in sources | Custom source list (pass `[]` to disable online search) |
+| `sources` | `GtfsSource[]` | `[]` | Source plugins for online search tabs |
 | `styled` | `boolean` | `true` | Set to `false` to disable default CSS class names |
 | `className` | `string` | — | Additional CSS class on the root element |
 
@@ -64,7 +63,7 @@ type GtfsSelectionResult =
 
 ## [transport.data.gouv.fr](https://transport.data.gouv.fr) source
 
-French public transit GTFS feeds, enabled by default. Datasets are cached in localStorage for 24h.
+French public transit GTFS feeds. Datasets are cached in localStorage for 24h.
 
 ```tsx
 import { GtfsSelector, transportDataGouvFr } from 'react-gtfs-selector';
@@ -91,8 +90,6 @@ const mobilityApi = createMobilityDataSource({ apiToken: 'your-token' });
 
 <GtfsSelector onSelect={handleSelect} sources={[mobilityApi]} />
 ```
-
-Both sources are included by default (CSV is enabled, API is disabled until a token is provided).
 
 ## Custom sources
 

@@ -26,7 +26,7 @@ React component library for selecting GTFS transit data sources. Provides a tabb
 
 ## Key design decisions
 
-- **Source plugin pattern**: Any online GTFS provider implements `GtfsSource` interface. This keeps the component extensible without modifying core code.
+- **Source plugin pattern**: Any online GTFS provider implements `GtfsSource` interface. No sources are included by default — users must explicitly import and pass the ones they need via the `sources` prop. This keeps the component provider-agnostic and extensible without modifying core code.
 - **Sync vs async search**: Sources can use the default `fetchDatasets()` + `search()` pattern (fetch all upfront, filter locally) or provide an optional `asyncSearch(query)` method for server-side search with debouncing. The `SourceSearch` component handles both automatically.
 - **Single callback**: `onSelect` receives a discriminated union (`type: 'file' | 'url'`) so consumers handle both cases in one place.
 - **CSS opt-out**: Default styles ship with the component via `react-gtfs-selector/style.css`. All classes prefixed `rgs-`. Pass `styled={false}` to disable class names entirely.
