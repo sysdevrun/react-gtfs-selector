@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-03-23
+
+### Changed
+
+- **BREAKING:** Replaced `sources` prop with `tabs` prop on `GtfsSelector`. File import and URL input are now tab entries (`fileTab`, `urlTab`) rather than hardcoded. Users have full control over which tabs appear and in what order.
+- **BREAKING:** Source exports (`mobilityDataCsv`, `transportDataGouvFr`, `mobilityData`) are now `GtfsTab` objects instead of `GtfsSource`. Use `createSourceTab()` to wrap custom `GtfsSource` implementations.
+
+### Added
+
+- `GtfsTab` interface — uniform tab type with `id`, `label`, `component`
+- `fileTab` and `urlTab` pre-configured tab exports
+- `createSourceTab(source)` helper to wrap a `GtfsSource` into a `GtfsTab`
+- `GtfsTabComponentProps` type for custom tab components
+
+### Removed
+
+- `sources` prop on `GtfsSelector`
+
 ## [0.4.0] - 2026-03-23
 
 ### Changed

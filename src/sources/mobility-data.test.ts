@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mobilityData, createMobilityDataSource } from './mobility-data';
+import { mobilityDataSource as mobilityData, createMobilityDataRawSource as createMobilityDataSource } from './mobility-data';
 
 const mockApiResponse = {
   total: 3,

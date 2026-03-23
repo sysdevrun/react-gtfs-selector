@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { GtfsSelector } from './GtfsSelector';
+import { fileTab, urlTab, createSourceTab } from '../tabs';
 import type { GtfsSource, GtfsSearchResult } from '../types';
 
 const mockDatasets: GtfsSearchResult[] = [
@@ -16,24 +17,26 @@ const testSource: GtfsSource = {
   search: vi.fn((_d, q) => (q.length >= 2 ? mockDatasets : [])),
 };
 
+const testTab = createSourceTab(testSource);
+
 describe('GtfsSelector', () => {
   it('renders with tabs', () => {
-    render(<GtfsSelector onSelect={vi.fn()} sources={[testSource]} />);
+    render(<GtfsSelector onSelect={vi.fn()} tabs={[fileTab, testTab]} />);
 
     expect(screen.getByTestId('gtfs-selector')).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Import file' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Test' })).toBeInTheDocument();
   });
 
-  it('shows drop zone by default (Import file tab)', () => {
-    render(<GtfsSelector onSelect={vi.fn()} sources={[testSource]} />);
+  it('shows drop zone by default when fileTab is first', () => {
+    render(<GtfsSelector onSelect={vi.fn()} tabs={[fileTab, testTab]} />);
 
     expect(screen.getByText(/Drag & drop a GTFS/)).toBeInTheDocument();
   });
 
   it('switches to source search tab', async () => {
     const user = userEvent.setup();
-    render(<GtfsSelector onSelect={vi.fn()} sources={[testSource]} />);
+    render(<GtfsSelector onSelect={vi.fn()} tabs={[fileTab, testTab]} />);
 
     await user.click(screen.getByRole('tab', { name: 'Test' }));
 
@@ -44,7 +47,7 @@ describe('GtfsSelector', () => {
 
   it('calls onSelect with file result on drop', () => {
     const onSelect = vi.fn();
-    render(<GtfsSelector onSelect={onSelect} sources={[testSource]} />);
+    render(<GtfsSelector onSelect={onSelect} tabs={[fileTab, testTab]} />);
 
     const dropZone = screen.getByRole('button');
     const file = new File(['data'], 'gtfs.zip', { type: 'application/zip' });
@@ -63,7 +66,7 @@ describe('GtfsSelector', () => {
   it('calls onSelect with url result on search selection', async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
-    render(<GtfsSelector onSelect={onSelect} sources={[testSource]} />);
+    render(<GtfsSelector onSelect={onSelect} tabs={[fileTab, testTab]} />);
 
     await user.click(screen.getByRole('tab', { name: 'Test' }));
 
@@ -88,7 +91,34 @@ describe('GtfsSelector', () => {
   });
 
   it('applies custom className', () => {
-    render(<GtfsSelector onSelect={vi.fn()} sources={[]} className="my-custom" />);
+    render(<GtfsSelector onSelect={vi.fn()} tabs={[fileTab]} className="my-custom" />);
     expect(screen.getByTestId('gtfs-selector').className).toContain('my-custom');
+  });
+
+  it('renders tabs in the order provided', () => {
+    render(<GtfsSelector onSelect={vi.fn()} tabs={[testTab, urlTab, fileTab]} />);
+
+    const tabButtons = screen.getAllByRole('tab');
+    expect(tabButtons[0]).toHaveTextContent('Test');
+    expect(tabButtons[1]).toHaveTextContent('Load from URL');
+    expect(tabButtons[2]).toHaveTextContent('Import file');
+  });
+
+  it('first tab in array is active by default', () => {
+    render(<GtfsSelector onSelect={vi.fn()} tabs={[urlTab, fileTab]} />);
+
+    expect(screen.getByTestId('url-input')).toBeInTheDocument();
+  });
+
+  it('omitting fileTab hides file import', () => {
+    render(<GtfsSelector onSelect={vi.fn()} tabs={[testTab, urlTab]} />);
+
+    expect(screen.queryByRole('tab', { name: 'Import file' })).not.toBeInTheDocument();
+  });
+
+  it('omitting urlTab hides URL input', () => {
+    render(<GtfsSelector onSelect={vi.fn()} tabs={[fileTab, testTab]} />);
+
+    expect(screen.queryByRole('tab', { name: 'Load from URL' })).not.toBeInTheDocument();
   });
 });

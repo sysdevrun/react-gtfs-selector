@@ -6,13 +6,14 @@ React component library for selecting GTFS transit data sources. Provides a tabb
 
 ## Architecture
 
-- **`src/types.ts`** — Core types: `GtfsSelectionResult`, `GtfsSearchResult`, `GtfsSource` interface
-- **`src/sources/`** — Source plugins implementing `GtfsSource`
+- **`src/types.ts`** — Core types: `GtfsSelectionResult`, `GtfsSearchResult`, `GtfsSource`, `GtfsTab`, `GtfsTabComponentProps`
+- **`src/tabs.tsx`** — Built-in tab exports (`fileTab`, `urlTab`) and `createSourceTab` helper
+- **`src/sources/`** — Source plugins implementing `GtfsSource`, exported as `GtfsTab` via `createSourceTab`
   - `transport-data-gouv-fr.ts` — French open transit data (fully implemented)
-  - `mobility-data-csv.ts` — Mobility Database CSV source (default, no token needed)
+  - `mobility-data-csv.ts` — Mobility Database CSV source (no token needed)
   - `mobility-data.ts` — Mobility Database API source (server-side search, requires API token)
 - **`src/components/`** — React components
-  - `GtfsSelector.tsx` — Main component with tabbed layout
+  - `GtfsSelector.tsx` — Main component with tabbed layout, renders tabs from `tabs` prop
   - `DropZone.tsx` — File drag-and-drop area
   - `SourceSearch.tsx` — Search UI for any `GtfsSource`
 - **`src/style.css`** — Default styles (opt-out via `styled={false}`)
@@ -26,7 +27,7 @@ React component library for selecting GTFS transit data sources. Provides a tabb
 
 ## Key design decisions
 
-- **Source plugin pattern**: Any online GTFS provider implements `GtfsSource` interface. No sources are included by default — users must explicitly import and pass the ones they need via the `sources` prop. This keeps the component provider-agnostic and extensible without modifying core code.
+- **Composable tabs**: The `tabs` prop (required) accepts an array of `GtfsTab` objects that controls which tabs appear and in what order. Built-in tabs (`fileTab`, `urlTab`) and source tabs (`mobilityDataCsv`, `transportDataGouvFr`) are all uniform `GtfsTab` objects with `id`, `label`, and `component`. Custom sources implement `GtfsSource` and are wrapped via `createSourceTab()`.
 - **Sync vs async search**: Sources can use the default `fetchDatasets()` + `search()` pattern (fetch all upfront, filter locally) or provide an optional `asyncSearch(query)` method for server-side search with debouncing. The `SourceSearch` component handles both automatically.
 - **Single callback**: `onSelect` receives a discriminated union (`type: 'file' | 'url'`) so consumers handle both cases in one place.
 - **CSS opt-out**: Default styles ship with the component via `react-gtfs-selector/style.css`. All classes prefixed `rgs-`. Pass `styled={false}` to disable class names entirely.

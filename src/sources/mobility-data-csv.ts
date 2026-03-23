@@ -1,5 +1,6 @@
 import Papa from 'papaparse';
-import type { GtfsSource, GtfsSearchResult } from '../types';
+import type { GtfsSource, GtfsSearchResult, GtfsTab } from '../types';
+import { createSourceTab } from '../tabs';
 
 const CSV_URL = 'https://files.mobilitydatabase.org/feeds_v2.csv';
 const CACHE_KEY = 'react-gtfs-selector:mobility-data-csv';
@@ -101,7 +102,7 @@ function buildResults(rows: CsvRow[]): GtfsSearchResult[] {
   return results;
 }
 
-export const mobilityDataCsv: GtfsSource = {
+export const mobilityDataCsvSource: GtfsSource = {
   id: 'mobility-data-csv',
   label: 'Mobility Database',
   available: true,
@@ -152,3 +153,5 @@ export const mobilityDataCsv: GtfsSource = {
     return results;
   },
 };
+
+export const mobilityDataCsv: GtfsTab = createSourceTab(mobilityDataCsvSource);

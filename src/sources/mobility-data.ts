@@ -1,4 +1,5 @@
-import type { GtfsSource, GtfsSearchResult } from '../types';
+import type { GtfsSource, GtfsSearchResult, GtfsTab } from '../types';
+import { createSourceTab } from '../tabs';
 
 const API_BASE = 'https://api.mobilitydatabase.org/v1';
 
@@ -64,19 +65,17 @@ function toSearchResult(item: MobilityDataSearchResult): GtfsSearchResult | null
   };
 }
 
-export function createMobilityDataSource(options: MobilityDataSourceOptions): GtfsSource {
+export function createMobilityDataRawSource(options: MobilityDataSourceOptions): GtfsSource {
   return {
     id: 'mobility-data',
     label: 'Mobility Database (API)',
     available: true,
 
     async fetchDatasets(): Promise<GtfsSearchResult[]> {
-      // Server-side search source — no upfront dataset fetch needed
       return [];
     },
 
     search(_datasets: GtfsSearchResult[], _query: string): GtfsSearchResult[] {
-      // Server-side search source — local filtering not used
       return [];
     },
 
@@ -112,8 +111,11 @@ export function createMobilityDataSource(options: MobilityDataSourceOptions): Gt
   };
 }
 
-/** Default instance (unavailable — needs an API token). */
-export const mobilityData: GtfsSource = {
+export function createMobilityDataSource(options: MobilityDataSourceOptions): GtfsTab {
+  return createSourceTab(createMobilityDataRawSource(options));
+}
+
+export const mobilityDataSource: GtfsSource = {
   id: 'mobility-data',
   label: 'Mobility Database (API)',
   available: false,
@@ -126,3 +128,6 @@ export const mobilityData: GtfsSource = {
     return [];
   },
 };
+
+/** Default instance (unavailable — needs an API token). */
+export const mobilityData: GtfsTab = createSourceTab(mobilityDataSource);

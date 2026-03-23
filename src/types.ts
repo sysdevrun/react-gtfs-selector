@@ -1,7 +1,22 @@
+import type { ComponentType } from 'react';
+
 /** Result passed to the onSelect callback */
 export type GtfsSelectionResult =
   | { type: 'file'; blob: Blob; fileName: string }
   | { type: 'url'; url: string; title: string; gtfsRtUrls?: string[] };
+
+/** Props passed to every tab component */
+export interface GtfsTabComponentProps {
+  onSelect: (result: GtfsSelectionResult) => void;
+  styled: boolean;
+}
+
+/** A tab in the GtfsSelector — every tab has an id, label, and component */
+export interface GtfsTab {
+  id: string;
+  label: string;
+  component: ComponentType<GtfsTabComponentProps>;
+}
 
 /** A single search result shown in the dropdown */
 export interface GtfsSearchResult {

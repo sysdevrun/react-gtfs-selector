@@ -19,7 +19,7 @@ npm install react-gtfs-selector
 ## Usage
 
 ```tsx
-import { GtfsSelector, transportDataGouvFr, mobilityDataCsv } from 'react-gtfs-selector';
+import { GtfsSelector, fileTab, urlTab, mobilityDataCsv, transportDataGouvFr } from 'react-gtfs-selector';
 import 'react-gtfs-selector/style.css'; // optional — bundled default styles
 
 function App() {
@@ -32,24 +32,41 @@ function App() {
           console.log('Got URL:', result.title, result.url);
         }
       }}
-      sources={[transportDataGouvFr, mobilityDataCsv]}
+      tabs={[mobilityDataCsv, transportDataGouvFr, fileTab, urlTab]}
     />
   );
 }
 ```
 
-The component shows a **tabbed interface**:
+The `tabs` prop controls exactly which tabs appear and in what order. Each entry is a `GtfsTab` object with `id`, `label`, and `component`.
 
-1. **Import file** — drag & drop or click to browse for a GTFS `.zip` file
-2. **Load from URL** — paste a direct GTFS feed URL
-3. One tab per source plugin passed via the `sources` prop
+### Built-in tabs
+
+- **`fileTab`** — drag & drop or click to browse for a GTFS `.zip` file
+- **`urlTab`** — paste a direct GTFS feed URL
+- **`mobilityDataCsv`** — search the Mobility Database (CSV, no token needed)
+- **`transportDataGouvFr`** — search French public transit feeds
+- **`mobilityData`** — Mobility Database API (unavailable by default, needs token)
+
+### Examples
+
+```tsx
+// Only file import and URL input
+<GtfsSelector onSelect={handleSelect} tabs={[fileTab, urlTab]} />
+
+// Only Mobility Database search
+<GtfsSelector onSelect={handleSelect} tabs={[mobilityDataCsv]} />
+
+// Custom order: sources first, then file, then URL
+<GtfsSelector onSelect={handleSelect} tabs={[mobilityDataCsv, transportDataGouvFr, fileTab, urlTab]} />
+```
 
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `onSelect` | `(result: GtfsSelectionResult) => void` | *required* | Callback when a source is selected |
-| `sources` | `GtfsSource[]` | `[]` | Source plugins for online search tabs |
+| `tabs` | `GtfsTab[]` | *required* | Ordered list of tabs to display |
 | `styled` | `boolean` | `true` | Set to `false` to disable default CSS class names |
 | `className` | `string` | — | Additional CSS class on the root element |
 
@@ -66,9 +83,9 @@ type GtfsSelectionResult =
 French public transit GTFS feeds. Datasets are cached in localStorage for 24h.
 
 ```tsx
-import { GtfsSelector, transportDataGouvFr } from 'react-gtfs-selector';
+import { GtfsSelector, transportDataGouvFr, fileTab } from 'react-gtfs-selector';
 
-<GtfsSelector onSelect={handleSelect} sources={[transportDataGouvFr]} />
+<GtfsSelector onSelect={handleSelect} tabs={[transportDataGouvFr, fileTab]} />
 ```
 
 ## Mobility Database sources
@@ -76,26 +93,27 @@ import { GtfsSelector, transportDataGouvFr } from 'react-gtfs-selector';
 The CSV source works out of the box with no configuration:
 
 ```tsx
-import { GtfsSelector, mobilityDataCsv } from 'react-gtfs-selector';
+import { GtfsSelector, mobilityDataCsv, fileTab } from 'react-gtfs-selector';
 
-<GtfsSelector onSelect={handleSelect} sources={[mobilityDataCsv]} />
+<GtfsSelector onSelect={handleSelect} tabs={[mobilityDataCsv, fileTab]} />
 ```
 
 To use the API source, pass a configured instance with your token:
 
 ```tsx
-import { GtfsSelector, createMobilityDataSource } from 'react-gtfs-selector';
+import { GtfsSelector, createMobilityDataSource, fileTab } from 'react-gtfs-selector';
 
 const mobilityApi = createMobilityDataSource({ apiToken: 'your-token' });
 
-<GtfsSelector onSelect={handleSelect} sources={[mobilityApi]} />
+<GtfsSelector onSelect={handleSelect} tabs={[mobilityApi, fileTab]} />
 ```
 
 ## Custom sources
 
-You can implement the `GtfsSource` interface to add your own GTFS feed providers:
+Implement the `GtfsSource` interface and wrap it with `createSourceTab`:
 
 ```ts
+import { createSourceTab, fileTab } from 'react-gtfs-selector';
 import type { GtfsSource } from 'react-gtfs-selector';
 
 const mySource: GtfsSource = {
@@ -106,7 +124,9 @@ const mySource: GtfsSource = {
   search(datasets, query) { /* ... */ },
 };
 
-<GtfsSelector onSelect={handleSelect} sources={[mySource]} />
+const myTab = createSourceTab(mySource);
+
+<GtfsSelector onSelect={handleSelect} tabs={[myTab, fileTab]} />
 ```
 
 ## Loading GTFS data
@@ -114,7 +134,7 @@ const mySource: GtfsSource = {
 Once the user selects a source, use [`gtfs-sqljs`](https://www.npmjs.com/package/gtfs-sqljs) to load and query the GTFS data:
 
 ```tsx
-import { GtfsSelector } from 'react-gtfs-selector';
+import { GtfsSelector, fileTab, urlTab } from 'react-gtfs-selector';
 import { GtfsSqlJs } from 'gtfs-sqljs';
 import type { GtfsSelectionResult } from 'react-gtfs-selector';
 
@@ -135,7 +155,7 @@ function App() {
     gtfs.close();
   };
 
-  return <GtfsSelector onSelect={handleSelect} />;
+  return <GtfsSelector onSelect={handleSelect} tabs={[fileTab, urlTab]} />;
 }
 ```
 

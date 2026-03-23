@@ -1,4 +1,5 @@
-import type { GtfsSource, GtfsSearchResult } from '../types';
+import type { GtfsSource, GtfsSearchResult, GtfsTab } from '../types';
+import { createSourceTab } from '../tabs';
 
 interface Dataset {
   id: string;
@@ -33,7 +34,7 @@ function toSearchResult(d: Dataset): GtfsSearchResult | null {
   };
 }
 
-export const transportDataGouvFr: GtfsSource = {
+export const transportDataGouvFrSource: GtfsSource = {
   id: 'transport-data-gouv-fr',
   label: 'transport.data.gouv.fr',
   available: true,
@@ -90,3 +91,5 @@ export const transportDataGouvFr: GtfsSource = {
     return results;
   },
 };
+
+export const transportDataGouvFr: GtfsTab = createSourceTab(transportDataGouvFrSource);

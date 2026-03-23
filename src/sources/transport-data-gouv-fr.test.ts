@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { transportDataGouvFr } from './transport-data-gouv-fr';
+import { transportDataGouvFrSource as transportDataGouvFr } from './transport-data-gouv-fr';
 
 const mockApiResponse = [
   {
