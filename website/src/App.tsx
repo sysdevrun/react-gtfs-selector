@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { GtfsSelector, transportDataGouvFr, mobilityDataCsv } from 'react-gtfs-selector';
+import { GtfsSelector, fileTab, urlTab, mobilityDataCsv, transportDataGouvFr } from 'react-gtfs-selector';
 import 'react-gtfs-selector/style.css';
 import type { GtfsSelectionResult } from 'react-gtfs-selector';
 import * as Comlink from 'comlink';
@@ -9,7 +9,7 @@ import { getProxyUrl } from './proxy';
 import { RouteList } from './RouteList';
 import './App.css';
 
-const sources = [mobilityDataCsv, transportDataGouvFr];
+const tabs = [fileTab, mobilityDataCsv, transportDataGouvFr, urlTab];
 
 function createWorker() {
   const raw = new Worker(new URL('./gtfs.worker.ts', import.meta.url), {
@@ -106,7 +106,7 @@ export function App() {
       </header>
 
       <div className="app__selector">
-        <GtfsSelector onSelect={handleSelect} sources={sources} />
+        <GtfsSelector onSelect={handleSelect} tabs={tabs} />
       </div>
 
       {loading && (
